@@ -1,0 +1,30 @@
+# Optional single-host HTTPS deployment. Use with compose.yaml, not by itself.
+services:
+  api:
+    environment:
+      PUBLIC_BASE_URL: https://${SIGNALBRIEF_DOMAIN:?Set SIGNALBRIEF_DOMAIN to your public hostname}
+      SECURE_COOKIES: "true"
+      LLM_MODEL: ${SIGNALBRIEF_MODEL:-openai/gpt-oss-120b}
+  worker:
+    environment:
+      PUBLIC_BASE_URL: https://${SIGNALBRIEF_DOMAIN:?Set SIGNALBRIEF_DOMAIN to your public hostname}
+      SECURE_COOKIES: "true"
+      LLM_MODEL: ${SIGNALBRIEF_MODEL:-openai/gpt-oss-120b}
+  proxy:
+    image: caddy:2
+    environment:
+      SIGNALBRIEF_DOMAIN: ${SIGNALBRIEF_DOMAIN:?Set SIGNALBRIEF_DOMAIN to your public hostname}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  caddy-data:
+  caddy-config:

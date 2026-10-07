@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>SignalBrief · Competitive intelligence</title>
+  <link rel="stylesheet" href="/static/style.css"><link rel="stylesheet" href="/static/mobile.css"><script src="/static/app.js" defer></script>
+</head>
+<body>
+  <div id="toast" role="status" hidden></div>
+  <section id="login" class="login-shell">
+    <div class="login-copy"><div class="wordmark"><span class="mark">S</span> SignalBrief</div>
+      <p class="eyebrow">COMPETITIVE INTELLIGENCE, WITH RECEIPTS</p>
+      <h1>Know what changed.<br>Decide what matters.</h1>
+      <p>Source-backed research, a critical second opinion, and a human decision before delivery.</p>
+      <div class="pipeline-label">COLLECT <span>→</span> RESEARCH <span>→</span> CHALLENGE <span>→</span> REVIEW</div>
+    </div>
+    <form id="login-form" class="login-card"><p class="eyebrow">YOUR RESEARCH WORKSPACE</p><h2>Welcome back</h2>
+      <p>Sign in to review signals and approve strategic briefs.</p>
+      <label for="password">Workspace password</label><input id="password" type="password" autocomplete="current-password" required>
+      <button type="submit" class="primary">Open workspace <span>↗</span></button>
+      <p id="login-error" class="error" role="alert"></p><small>Use the ADMIN_PASSWORD configured in your local .env.</small>
+    </form>
+  </section>
+  <div id="workspace" hidden>
+    <aside class="sidebar"><div class="wordmark"><span class="mark">S</span> SignalBrief</div>
+      <div class="side-label">WORKSPACE</div><button class="nav-item active" id="nav-signals">◈ &nbsp; Intelligence inbox</button>
+      <button class="nav-item" id="nav-new">＋ &nbsp; New signal</button>
+      <div class="side-bottom"><div class="small-dot"></div><span id="worker-state">Checking worker…</span>
+        <button id="logout" class="quiet">Sign out ↗</button></div>
+    </aside>
+    <main>
+      <header><div><p class="eyebrow">RESEARCH OPERATIONS</p><h1>Intelligence inbox<span class="accent">.</span></h1>
+        <p class="muted">From competitor announcements to considered decisions.</p></div>
+        <button id="new-signal" class="primary">＋ New signal</button></header>
+      <div id="configuration" class="notice" hidden></div>
+      <section class="stats" aria-label="Run overview">
+        <div class="stat"><span>Signals collected</span><strong id="count-all">0</strong><small>Most recent 100 runs</small></div>
+        <div class="stat"><span>Ready for review</span><strong id="count-review">0</strong><small>Your decision is required</small></div>
+        <div class="stat"><span>Approved briefs</span><strong id="count-approved">0</strong><small>Authorized for delivery</small></div>
+        <div class="stat"><span>Processing</span><strong id="count-processing">0</strong><small>Research and analysis underway</small></div>
+      </section>
+      <div class="inbox-toolbar"><h2>Recent signals</h2><label>Filter <select id="filter"><option value="all">All statuses</option>
+        <option value="awaiting_approval">Needs review</option><option value="approved">Approved</option>
+        <option value="failed">Failed</option><option value="rejected">Rejected</option></select></label></div>
+      <div class="inbox-grid"><section id="run-list" aria-label="Signal list"></section>
+        <section id="detail" class="detail-card"><div class="empty"><div class="empty-icon">◈</div><h2>Every decision starts with a signal</h2>
+          <p>Select a signal to inspect its sources, findings, critique, and delivery record.</p></div></section></div>
+      <footer>Facts stay attached to their sources. Strategy stays open to challenge.</footer>
+    </main>
+  </div>
+  <dialog id="event-dialog"><form id="event-form"><div class="dialog-heading"><div><p class="eyebrow">START RESEARCH</p><h2>Capture a new signal</h2></div>
+    <button type="button" id="close-dialog" class="quiet" aria-label="Close">✕</button></div>
+    <p class="muted">Add a public announcement from a registered competitor. The original page becomes the primary evidence.</p>
+    <label for="competitor">Competitor</label><select id="competitor" required></select>
+    <p id="competitor-context" class="muted small"></p>
+    <label for="event-title">Signal title</label><input id="event-title" minlength="5" maxlength="250" required placeholder="A product launch, feature update, or pricing announcement">
+    <label for="source-url">Announcement URL</label><input id="source-url" type="url" required placeholder="https://…">
+    <p id="allowed-domains" class="muted small"></p>
+    <label for="published-at">Publication date <span class="muted">(optional)</span></label><input id="published-at" type="datetime-local">
+    <button class="primary wide" type="submit">Collect evidence and research ↗</button><p id="event-error" class="error" role="alert"></p>
+  </form></dialog>
+</body></html>

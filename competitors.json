@@ -1,0 +1,14 @@
+[
+  {
+    "name": "Notion",
+    "domains": ["www.notion.com", "notion.com", "www.notion.so", "notion.so"],
+    "reference_urls": ["https://www.notion.com/product/ai"],
+    "our_context": "We are a small B2B knowledge-work software company competing on team search and document collaboration. Our product team wants evidence-backed launch intelligence and reversible validation experiments, without invented market-share or revenue estimates."
+  },
+  {
+    "name": "Linear",
+    "domains": ["linear.app"],
+    "reference_urls": ["https://linear.app/features"],
+    "our_context": "We build project-management software for small engineering teams. Evaluate announced workflow features for customer relevance and integration opportunities. Recommendations should be validation experiments, with explicit assumptions and no invented impact numbers."
+  }
+]

@@ -1,0 +1,35 @@
+services:
+  api:
+    image: signalbrief:local
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_PATH: /app/data/signalbrief.sqlite3
+      COMPETITORS_PATH: /app/competitors.json
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - signalbrief-data:/app/data
+      - ./competitors.json:/app/competitors.json:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", ".venv/bin/python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+  worker:
+    image: signalbrief:local
+    command: [".venv/bin/python", "-m", "signalbrief.worker"]
+    env_file: .env
+    environment:
+      DATABASE_PATH: /app/data/signalbrief.sqlite3
+      COMPETITORS_PATH: /app/competitors.json
+    volumes:
+      - signalbrief-data:/app/data
+      - ./competitors.json:/app/competitors.json:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+volumes:
+  signalbrief-data:
