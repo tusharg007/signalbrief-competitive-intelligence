@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 
@@ -12,15 +13,25 @@ def settings(tmp_path):
     competitors = tmp_path / "competitors.json"
     competitors.write_text(json.dumps([{"name": "Linear", "domains": ["linear.app"],
         "reference_urls": [], "our_context": "Synthetic test company providing small-team project tools."}]))
-    return Settings(_env_file=None, database_path=tmp_path / "test.sqlite3", competitors_path=competitors,
+    value = Settings(_env_file=None, database_path=tmp_path / "test.sqlite3", competitors_path=competitors,
+                    database_url=os.getenv("SIGNALBRIEF_TEST_DATABASE_URL", ""),
                     admin_password="a-secure-test-password", webhook_api_key="k" * 40,
                     session_secret="s" * 40, llm_api_key="test-key", public_base_url="http://testserver",
                     zapier_hook_url="https://hooks.zapier.com/hooks/catch/123456/testonly/")
+    if value.database_url.get_secret_value():
+        from urllib.parse import urlsplit
+        assert urlsplit(value.database_url.get_secret_value()).path == "/signalbrief_test"
+        isolated = Store(value.database_path, value.database_url.get_secret_value())
+        isolated.initialize()
+        with isolated.transaction() as conn:
+            conn.execute("CREATE TABLE IF NOT EXISTS login_attempts (client TEXT NOT NULL, at DOUBLE PRECISION NOT NULL)")
+            conn.execute("TRUNCATE deliveries, reports, audit, runs, worker_health, login_attempts RESTART IDENTITY CASCADE")
+    return value
 
 
 @pytest.fixture
 def store(settings):
-    value = Store(settings.database_path)
+    value = Store(settings.database_path, settings.database_url.get_secret_value())
     value.initialize()
     return value
 

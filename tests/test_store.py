@@ -49,7 +49,7 @@ def test_checkpoint_survives_new_store_instance(store, event, source):
     run_id, _ = store.enqueue(event, 20)
     item = store.claim(180, 3)
     store.checkpoint(run_id, item["lease_token"], "evidence_collected", "sources_json", [source.model_dump()])
-    restored = Store(store.path).get_run(run_id)
+    restored = Store(store.path, store.database_url).get_run(run_id)
     assert restored["sources"][0]["sha256"] == source.sha256
 
 

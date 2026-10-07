@@ -14,7 +14,7 @@ from signalbrief.worker import Worker
 async def verify(args):
     settings = Settings()
     settings.require_auth()
-    store = Store(settings.database_path)
+    store = Store(settings.database_path, settings.database_url.get_secret_value())
     store.initialize()
     if args.run_id:
         run_id = args.run_id

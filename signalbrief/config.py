@@ -8,6 +8,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore", case_sensitive=False)
     database_path: Path = Path("data/signalbrief.sqlite3")
+    database_url: SecretStr = SecretStr("")
+    showcase_run_ids: str = ""
     competitors_path: Path = Path("competitors.json")
     admin_password: SecretStr = SecretStr("")
     webhook_api_key: SecretStr = SecretStr("")
@@ -28,6 +30,14 @@ class Settings(BaseSettings):
     max_daily_runs: int = 20
     max_sources: int = 4
     max_source_chars: int = 14000
+
+    @field_validator("database_url")
+    @classmethod
+    def database_url_valid(cls, value: SecretStr) -> SecretStr:
+        url = value.get_secret_value()
+        if url and not url.startswith(("postgresql://", "postgres://")):
+            raise ValueError("DATABASE_URL must be a PostgreSQL connection URL")
+        return value
 
     @field_validator("llm_provider")
     @classmethod

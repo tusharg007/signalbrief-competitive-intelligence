@@ -47,7 +47,8 @@ def main():
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--output", type=Path, default=Path("data/evaluation.json"))
     args = parser.parse_args()
-    run = Store(Settings().database_path).get_run(args.run_id)
+    settings = Settings()
+    run = Store(settings.database_path, settings.database_url.get_secret_value()).get_run(args.run_id)
     if run is None or run["report"] is None:
         raise SystemExit("A completed real run is required")
     result = evaluate(run)

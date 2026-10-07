@@ -1,4 +1,5 @@
 'use strict';
+const publicView = document.body.dataset.mode === 'showcase';
 const $ = (id) => document.getElementById(id);
 let csrf = '', runs = [], competitors = [], selected = new URLSearchParams(location.search).get('run');
 let currentRun = null, activeTab = 'brief', refreshTimer, eventId = crypto.randomUUID();
@@ -17,6 +18,10 @@ const link = (url,text) => { const a=el('a','',text); const u=new URL(url,locati
   a.href=u.href;a.target='_blank';a.rel='noopener noreferrer';return a; };
 
 async function api(path, options={}) {
+  if(publicView){
+    if(options.method && options.method!=='GET')throw new Error('This published workspace is read-only.');
+    path=path.replace('/api/runs','/api/showcase/runs').replace('/api/status','/api/showcase/status');
+  }
   const headers={'Content-Type':'application/json',...options.headers};
   if(options.method && options.method!=='GET')headers['X-CSRF-Token']=csrf;
   const response=await fetch(path,{...options,headers,credentials:'same-origin'});
@@ -31,7 +36,12 @@ function toast(text){$('toast').textContent=text;$('toast').hidden=false;setTime
 function showLogin(){clearInterval(refreshTimer);$('workspace').hidden=true;$('login').hidden=false;}
 async function startWorkspace(){
   $('login').hidden=true;$('workspace').hidden=false;
-  competitors=await api('/api/competitors');$('competitor').replaceChildren();
+  if(publicView){
+    for(const id of ['new-signal','nav-new','logout'])$(id).hidden=true;
+    document.querySelector('header .muted').textContent='Read-only execution evidence from two approved live runs. Open Evidence, Agent record, or Activity & delivery to inspect the proof.';
+    $('configuration').hidden=false;$('configuration').textContent='Published portfolio workspace. Research ran with real Groq, CrewAI and AutoGen; the recorded Slack deliveries happened before cloud deployment.';
+  }
+  competitors=publicView?[]:await api('/api/competitors');$('competitor').replaceChildren();
   competitors.forEach(c=>{const option=el('option','',c.name);option.value=c.name;$('competitor').append(option);});
   updateCompetitor();await refresh();clearInterval(refreshTimer);refreshTimer=setInterval(()=>refresh().catch(e=>toast(e.message)),5000);
 }
@@ -45,11 +55,12 @@ async function refresh(force=false){
   const missing=[];if(!status.model_configured)missing.push('Configure a model API key in .env.');
   if(!status.zapier_configured)missing.push('Configure ZAPIER_HOOK_URL for real delivery.');
   if(!status.worker_online)missing.push('Start the worker to process new signals.');
-  $('configuration').hidden=!missing.length;$('configuration').textContent=missing.join(' ');
+  if(!publicView){$('configuration').hidden=!missing.length;$('configuration').textContent=missing.join(' ');}
   $('count-all').textContent=runs.length;
   $('count-review').textContent=runs.filter(r=>r.status==='awaiting_approval').length;
   $('count-approved').textContent=runs.filter(r=>r.status==='approved').length;
   $('count-processing').textContent=runs.filter(r=>['queued','running'].includes(r.status)).length;
+  if(publicView && !selected && runs.length)selected=runs[0].id;
   renderRuns();
   if(selected){const next=await api('/api/runs/'+selected);
     const changed=!currentRun||next.updated_at!==currentRun.updated_at||next.status!==currentRun.status||
@@ -72,7 +83,7 @@ function renderDetail(){const r=currentRun,parent=$('detail');parent.replaceChil
   const head=el('div','detail-header');const row=el('div','row');row.append(el('span','company-label',r.event.competitor+' / SIGNAL BRIEF'),badge(r.status));
   head.append(row,el('h2','',r.research?.headline||r.event.title));const meta=el('div','detail-meta');
   meta.append(el('span','','Captured '+date(r.created_at)),el('span','','Version '+r.version),el('span','',(r.sources?.length||0)+' sources'));
-  if(r.report)meta.append(link('/api/runs/'+r.id+'/report.md','↓ Export brief'));
+  if(r.report)meta.append(link((publicView?'/api/showcase/runs/':'/api/runs/')+r.id+'/report.md','↓ Export brief'));
   head.append(meta);parent.append(head);
   const tabs=el('div','tabs');for(const [id,title] of [['brief','Strategy brief'],['evidence','Evidence'],['agents','Agent record'],['activity','Activity & delivery']]){
     const b=el('button','tab'+(activeTab===id?' active':''),title);b.onclick=()=>{activeTab=id;renderDetail();};tabs.append(b);}
@@ -152,4 +163,4 @@ $('event-form').onsubmit=async(e)=>{e.preventDefault();const b=e.submitter;b.dis
     selected=result.run_id;currentRun=null;activeTab='brief';eventId=crypto.randomUUID();$('event-dialog').close();$('event-title').value='';$('source-url').value='';
     history.replaceState(null,'','?run='+selected);await refresh(true);toast('Signal captured. Research is queued.');
   }catch(error){$('event-error').textContent=error.message;}finally{b.disabled=false;}};
-(async()=>{try{const session=await api('/api/session');csrf=session.csrf;if(session.authenticated)await startWorkspace();else showLogin();}catch(error){$('login-error').textContent=error.message;}})();
+(async()=>{try{if(publicView){await startWorkspace();return;}const session=await api('/api/session');csrf=session.csrf;if(session.authenticated)await startWorkspace();else showLogin();}catch(error){$('login-error').textContent=error.message;}})();

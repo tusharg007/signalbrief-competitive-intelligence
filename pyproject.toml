@@ -12,6 +12,7 @@ dependencies = [
   "pydantic-settings>=2.8,<3", "python-dotenv>=1,<2", "httpx>=0.28,<1", "itsdangerous>=2.2,<3",
   "beautifulsoup4>=4.13,<5", "crewai==1.6.1",
   "autogen-agentchat>=0.7,<0.8", "autogen-ext[openai]>=0.7,<0.8",
+  "psycopg[binary]>=3.2,<4",
 ]
 
 [project.optional-dependencies]

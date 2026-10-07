@@ -22,7 +22,7 @@ log = logging.getLogger("signalbrief.worker")
 class Worker:
     def __init__(self, settings: Settings, store: Store | None = None):
         self.settings = settings
-        self.store = store or Store(settings.database_path)
+        self.store = store or Store(settings.database_path, settings.database_url.get_secret_value())
         self.worker_id = uuid.uuid4().hex
 
     async def process(self, item: dict) -> None:

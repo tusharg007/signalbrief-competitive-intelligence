@@ -1,4 +1,4 @@
-"""SQLite transactions own workflow state. Network/model calls never hold a transaction."""
+"""Durable transactions own workflow state. Network/model calls never hold a transaction."""
 import hashlib
 import json
 import sqlite3
@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from signalbrief.schemas import Event
+from signalbrief.database import postgres_schema, postgres_transaction
 
 
 class Conflict(Exception):
@@ -24,11 +25,16 @@ def compact(value: Any) -> str:
 
 
 class Store:
-    def __init__(self, path: Path):
+    def __init__(self, path: Path, database_url: str = ""):
         self.path = path
+        self.database_url = database_url
 
     @contextmanager
     def transaction(self):
+        if self.database_url:
+            with postgres_transaction(self.database_url) as conn:
+                yield conn
+            return
         conn = sqlite3.connect(self.path, timeout=15, isolation_level=None)
         conn.row_factory = sqlite3.Row
         conn.execute("PRAGMA foreign_keys=ON")
@@ -44,10 +50,7 @@ class Store:
             conn.close()
 
     def initialize(self) -> None:
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        with sqlite3.connect(self.path) as conn:
-            conn.execute("PRAGMA journal_mode=WAL")
-            conn.executescript("""
+        schema = """
                 CREATE TABLE IF NOT EXISTS runs (
                     id TEXT PRIMARY KEY, event_id TEXT UNIQUE NOT NULL, event_json TEXT NOT NULL,
                     event_hash TEXT NOT NULL, status TEXT NOT NULL, stage TEXT NOT NULL DEFAULT 'queued',
@@ -80,7 +83,17 @@ class Store:
                 CREATE TABLE IF NOT EXISTS worker_health (
                     id TEXT PRIMARY KEY, last_seen REAL NOT NULL
                 );
-            """)
+            """
+        if self.database_url:
+            with self.transaction() as conn:
+                for statement in postgres_schema(schema).split(";"):
+                    if statement.strip():
+                        conn.execute(statement)
+        else:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            with sqlite3.connect(self.path) as conn:
+                conn.execute("PRAGMA journal_mode=WAL")
+                conn.executescript(schema)
 
     @staticmethod
     def _audit(conn, run_id: str, event: str, details: dict | None = None) -> None:
@@ -151,7 +164,7 @@ class Store:
                 self._audit(conn, r["id"], "lease_exhausted")
             row = conn.execute("""SELECT * FROM runs WHERE attempts<? AND
                 ((status='queued' AND available_at<=?) OR (status='running' AND lease_until<?))
-                AND (? IS NULL OR id=?) ORDER BY created_at LIMIT 1""",
+                AND (CAST(? AS TEXT) IS NULL OR id=?) ORDER BY created_at LIMIT 1""",
                 (max_attempts, now, now, run_id, run_id)).fetchone()
             if row is None:
                 return None
@@ -343,10 +356,13 @@ class Store:
 
     def worker_seen(self, worker_id: str) -> None:
         with self.transaction() as conn:
-            conn.execute("INSERT OR REPLACE INTO worker_health VALUES(?,?)", (worker_id, time.time()))
+            conn.execute("""INSERT INTO worker_health VALUES(?,?)
+                            ON CONFLICT(id) DO UPDATE SET last_seen=excluded.last_seen""",
+                         (worker_id, time.time()))
 
     def health(self) -> dict:
         with self.transaction() as conn:
             last = conn.execute("SELECT MAX(last_seen) FROM worker_health").fetchone()[0]
-            counts = dict(conn.execute("SELECT status,COUNT(*) FROM runs GROUP BY status").fetchall())
+            rows = conn.execute("SELECT status,COUNT(*) AS count FROM runs GROUP BY status").fetchall()
+            counts = {row["status"]: row["count"] for row in rows}
         return {"database": "ok", "worker_online": bool(last and time.time() - last < 30), "runs": counts}

@@ -27,7 +27,7 @@ class Login(BaseModel):
 def create_app(settings: Settings | None = None) -> FastAPI:
     settings = settings or get_settings()
     settings.require_auth()
-    store = Store(settings.database_path)
+    store = Store(settings.database_path, settings.database_url.get_secret_value())
     static = Path(__file__).parent / "static"
 
     @asynccontextmanager
@@ -35,7 +35,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         store.initialize()
         with store.transaction() as conn:
             conn.execute("""CREATE TABLE IF NOT EXISTS login_attempts (
-                client TEXT NOT NULL, at REAL NOT NULL
+                client TEXT NOT NULL, at DOUBLE PRECISION NOT NULL
             )""")
         load_competitors(settings)
         yield
@@ -106,6 +106,49 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         # Public health intentionally omits run details, credentials, and integration URLs.
         return {"status": "ok", "version": "1.0.0", "database": status["database"],
                 "worker_online": status["worker_online"]}
+
+    @app.get("/ready")
+    def ready():
+        status = health()
+        task = getattr(app.state, "worker_task", None)
+        if not status["worker_online"] or (task is not None and task.done()):
+            raise HTTPException(503, "Worker is not ready")
+        return status
+
+    showcase_ids = {value.strip() for value in settings.showcase_run_ids.split(",") if value.strip()}
+
+    def published_run(run_id):
+        if run_id not in showcase_ids:
+            raise HTTPException(404, "Published brief not found")
+        run = run_or_404(run_id)
+        if run["status"] != "approved":
+            raise HTTPException(404, "Published brief not found")
+        # Public readers see execution proof, never webhook payloads or credentials.
+        run["deliveries"] = [{key: delivery[key] for key in (
+            "id", "kind", "status", "attempts", "created_at", "version")}
+            for delivery in run["deliveries"]]
+        return run
+
+    @app.get("/showcase", include_in_schema=False)
+    def showcase():
+        return FileResponse(static / "showcase.html")
+
+    @app.get("/api/showcase/runs")
+    def showcase_runs():
+        return [run for run in store.list_runs() if run["id"] in showcase_ids and run["status"] == "approved"]
+
+    @app.get("/api/showcase/status")
+    def showcase_status():
+        return {**health(), "model_configured": bool(settings.model_key),
+                "zapier_configured": valid_hook(settings.zapier_hook_url.get_secret_value())}
+
+    @app.get("/api/showcase/runs/{run_id}")
+    def showcase_run(run_id: str):
+        return published_run(run_id)
+
+    @app.get("/api/showcase/runs/{run_id}/report.md", response_class=PlainTextResponse)
+    def showcase_report(run_id: str):
+        return markdown_report(published_run(run_id))
 
     @app.get("/api/session")
     def session(request: Request):

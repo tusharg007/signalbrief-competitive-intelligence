@@ -16,3 +16,23 @@ jobs:
       - run: uv sync --frozen --extra dev --python 3.11
       - run: uv run ruff check signalbrief scripts tests
       - run: uv run pytest -q
+  postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: signalbrief-local-test
+          POSTGRES_DB: signalbrief_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      SIGNALBRIEF_TEST_DATABASE_URL: postgresql://postgres:signalbrief-local-test@localhost:5432/signalbrief_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --frozen --extra dev --python 3.11
+      - run: uv run pytest -q
