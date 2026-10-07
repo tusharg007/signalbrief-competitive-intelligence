@@ -31,7 +31,7 @@ The native OpenAI-compatible CrewAI adapter has explicit provider routing; relyi
 
 ## Durable work and delivery
 
-SQLite `BEGIN IMMEDIATE` serializes short state transitions. Claims carry random ownership tokens and expiring leases. A heartbeat extends the lease while a model or collector runs. Writes reject stale ownership. Network and model calls do not hold database transactions.
+SQLite `BEGIN IMMEDIATE` serializes short state transitions locally. PostgreSQL uses a transaction-scoped advisory lock for the same single-workspace contract. The full regression suite runs against both backends. Claims carry random ownership tokens and expiring leases. A heartbeat extends the lease while a model or collector runs. Writes reject stale ownership. Network and model calls do not hold database transactions.
 
 The outbox is inserted with the approval or report-ready transition. Delivery workers atomically claim rows, retain the stable delivery ID across retries, and persist safe HTTP receipts. Backend retries stop after five attempts. A downstream timeout is ambiguous, so delivery is at least once. No end-to-end exactly-once guarantee is made.
 
@@ -51,7 +51,7 @@ The council retries a rate-limited model request up to three times, waiting 20, 
 
 ## Scaling path
 
-For multiple hosts, move queue state, reports and the transactional outbox into PostgreSQL; use row-level leases and object storage for evidence. Add organization IDs, SSO/RBAC, per-tenant secrets, audit retention, independent evaluation gates and completion callbacks from integration workflows. Add process-isolated model stages, a provider capability registry, and explicit cost budgets. Replace the AutoGen adapter when moving to a maintained successor if the project requirements permit it.
+The hosted deployment already uses Neon PostgreSQL for queue state, reports, frozen evidence and the outbox. For higher concurrency across multiple hosts, use row-level leases and object storage for large evidence packets. Add organization IDs, SSO/RBAC, per-tenant secrets, audit retention, independent evaluation gates and completion callbacks from integration workflows. Add process-isolated model stages, a provider capability registry, and explicit cost budgets. Replace the AutoGen adapter when moving to a maintained successor if the project requirements permit it.
 
 ## Portfolio discussion
 

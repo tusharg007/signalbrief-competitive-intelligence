@@ -55,8 +55,29 @@ Credential-free machine records remain under ignored `data/`: `live-verification
 
 The implemented application runs locally with public HTTPS access through an operator-run ngrok tunnel. Screenshots show successful public dashboard login, worker-online status, and the approved real report in Slack. The operator configured **Linear RSS to SignalBrief** and its POST test returned `created: true` for run `d1434228a9ad4f92acc120d45af1c437`. The new run completed and was manually approved; its review request and final report both appeared in Slack with the correct public links. A later Zapier screenshot confirms the inbound Zap is published and on, with a displayed two-minute polling interval. Native Slack button approvals are outside the implemented scope; Slack messages link to the authenticated dashboard. See [ZAPIER.md](ZAPIER.md) for the concrete setup and payload mapping.
 
-The operator completed Slack, tunnel and RSS setup following the walkthrough. [CONNECT_SLACK_AND_GO_LIVE.md](CONNECT_SLACK_AND_GO_LIVE.md) records the setup and flow checks. The advertised Linear RSS feed was separately verified with HTTP 200. An optional Caddy/Compose hosting configuration is included; a public server deployment remains unverified. The publication screen reports premium-app access during a 14-day Zapier trial, so continued webhook operation depends on retaining an eligible plan afterward.
+The operator completed Slack, tunnel and RSS setup following the walkthrough. [CONNECT_SLACK_AND_GO_LIVE.md](CONNECT_SLACK_AND_GO_LIVE.md) records the setup and flow checks. The advertised Linear RSS feed was separately verified with HTTP 200. An optional Caddy/Compose hosting configuration is included; the later Render + Neon deployment is documented below. The publication screen reports premium-app access during a 14-day Zapier trial, so continued webhook operation depends on retaining an eligible plan afterward.
 
 The operator's latest screenshots show the API running on port **8007**, exposed through ngrok, with the normal worker online. Both the application and tunnel must stay running for this local hosting route. The earlier review preview used port 8008.
 
-The final raw-file check found both integration values empty in `.env`, while the already-running API still reported its successfully loaded model/hook configuration. Editor-save confirmations did not change the file observed by the terminal; the source of that synchronization issue was not established. The application does not overwrite existing `.env` files. The Windows launcher accepts hidden session-only credentials, so account setup can proceed without repeatedly editing that file.
+An earlier raw-file check found both integration values empty in `.env`, while the already-running API still reported its successfully loaded model/hook configuration. Editor-save confirmations did not change the file observed by the terminal; the source of that synchronization issue was not established. The application does not overwrite existing `.env` files. The Windows launcher accepts hidden session-only credentials, so account setup can proceed without repeatedly editing that file.
+
+## Render + Neon verification — 8 October 2026
+
+The full API and worker were deployed to https://signalbrief-dncb.onrender.com on Render free compute. A dedicated Neon PostgreSQL 17 database stores workflow state. Both approved real runs were imported with source packets, messages, metrics, audits, report versions and completed deliveries. No pending notification was imported or replayed.
+
+Checks against the public deployment returned:
+
+| Check | Observed result |
+| --- | --- |
+| `/health` and `/ready` | HTTP 200; database ok; worker online |
+| `/showcase` and selected published run | HTTP 200 without an operator session |
+| `/api/runs` without login | HTTP 401 |
+| Administrator login and authenticated run list | HTTP 200 |
+| Identical RSS payload posted to `/events` | Existing run ID, `status: duplicate`, `created: false` |
+| Unselected/draft showcase boundaries | Covered by regression tests |
+| SQLite suite | 49 passed locally |
+| PostgreSQL 17 suite | The same 49 tests passed locally |
+
+The operator confirmed the published inbound Zap URL was changed from ngrok to Render. The duplicate cloud probe validates ingress and deduplication without initiating inference or Slack delivery. The gallery's Slack captures document original real deliveries before cloud deployment; they do not claim a fresh cloud model run.
+
+App screenshots are reproduced from the actual deployed read-only workspace using `scripts/capture_proof.cjs`. Zapier and Slack screenshots are unmodified operator captures. Provider token usage and stage durations in the README belong to the original RSS run, not to mocked regression calls. Free Render sleeps on idle; see the deployment guide for operating limits.
