@@ -56,6 +56,6 @@ The hosted admission cap is five new runs per day, with ten-second idle polling.
 
 ## Maintenance
 
-Check `/ready`, Render logs, dashboard status and Zap History. A webhook receipt proves acceptance; check Slack separately. Back up Neon with a PostgreSQL dump or supported database export/branch workflow, retaining frozen evidence and audit history. Deploy application code after CI passes; the same test suite exercises SQLite and PostgreSQL.
+Check `/ready`, Render logs, dashboard status and Zap History. A webhook receipt proves acceptance; check Slack separately. Back up Neon with a PostgreSQL dump or supported database export/branch workflow, retaining frozen evidence and audit history. The Render service uses `checksPass` autodeploys. Deploy application code after CI passes; the same test suite exercises SQLite and PostgreSQL.
 
 Vercel is not used here: the existing full backend and worker stay together on Render, keeping one authentication origin.

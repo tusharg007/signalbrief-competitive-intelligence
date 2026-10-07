@@ -163,4 +163,4 @@ $('event-form').onsubmit=async(e)=>{e.preventDefault();const b=e.submitter;b.dis
     selected=result.run_id;currentRun=null;activeTab='brief';eventId=crypto.randomUUID();$('event-dialog').close();$('event-title').value='';$('source-url').value='';
     history.replaceState(null,'','?run='+selected);await refresh(true);toast('Signal captured. Research is queued.');
   }catch(error){$('event-error').textContent=error.message;}finally{b.disabled=false;}};
-(async()=>{try{if(publicView){await startWorkspace();return;}const session=await api('/api/session');csrf=session.csrf;if(session.authenticated)await startWorkspace();else showLogin();}catch(error){$('login-error').textContent=error.message;}})();
+(async()=>{try{if(publicView){await startWorkspace();return;}const session=await api('/api/session');csrf=session.csrf;$('login-form').querySelector('button').disabled=false;if(session.authenticated)await startWorkspace();else showLogin();}catch(error){$('login-error').textContent=error.message;}})();

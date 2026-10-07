@@ -81,3 +81,9 @@ Checks against the public deployment returned:
 The operator confirmed the published inbound Zap URL was changed from ngrok to Render. The duplicate cloud probe validates ingress and deduplication without initiating inference or Slack delivery. The gallery's Slack captures document original real deliveries before cloud deployment; they do not claim a fresh cloud model run.
 
 App screenshots are reproduced from the actual deployed read-only workspace using `scripts/capture_proof.cjs`. Zapier and Slack screenshots are unmodified operator captures. Provider token usage and stage durations in the README belong to the original RSS run, not to mocked regression calls. Free Render sleeps on idle; see the deployment guide for operating limits.
+
+### Fresh hosted inference and delivery
+
+With operator authorization, run `357d68840b1a43e0afb44834b1b64c05` executed on Render against the same public Linear evidence. It completed on attempt 1, producing two CrewAI task outputs and three AutoGen messages. Neon stored two sources and nine checked citation excerpts. Research took 33.415 seconds; analysis took 132.1 seconds. The recorded attempt took 187.558 seconds. Groq reported 14,072 research input tokens / 8,716 output tokens and 8,355 analysis input tokens / 4,698 output tokens.
+
+The report remains `awaiting_approval`. Its single `review_requested` outbox delivery is `sent`, attempt 1, proving Zapier accepted the request. Final Slack appearance for this cloud notification is not independently verified. No approval or approved-report delivery was performed by the assistant. The screenshot `cloud-execution.png` was captured through authenticated read-only inspection of the actual new report.

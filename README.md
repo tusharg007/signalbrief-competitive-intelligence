@@ -86,6 +86,12 @@ Each screenshot records a specific part of the working system. App captures show
 
 **Validates:** the reviewed summary reached Slack after approval, beyond merely obtaining an HTTP 200 webhook receipt. Historical ngrok links identify the original local verification session.
 
+### 8. Fresh execution on Render
+
+![Fresh hosted CrewAI and AutoGen execution, with real council messages and provider token measurements](docs/assets/cloud-execution.png)
+
+**Validates:** a new run executed on the hosted Render worker after deployment, using Groq and two public Linear sources. Run `357d68840b1a43e0afb44834b1b64c05` saved five actual agent outputs and a validated report in Neon. Its review-request webhook was accepted by Zapier on the first attempt. The report remains awaiting human approval; downstream Slack appearance for this new notification has not been independently checked. The public showcase continues to expose only the two approved historical runs.
+
 ## Architecture and framework roles
 
 ```mermaid
