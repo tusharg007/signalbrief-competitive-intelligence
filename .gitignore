@@ -8,4 +8,3 @@ data/
 *.egg-info/
 build/
 dist/
-signalbrief/static/walkthrough-only.css

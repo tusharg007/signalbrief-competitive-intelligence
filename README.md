@@ -13,16 +13,6 @@
 
 [**Open the live portfolio workspace ↗**](https://signalbrief-dncb.onrender.com/showcase?run=d1434228a9ad4f92acc120d45af1c437) · [Deployment guide](docs/DEPLOYMENT.md) · [Verification record](docs/VERIFICATION.md) · [Architecture](docs/ARCHITECTURE.md)
 
-## Detailed annotated video walkthrough
-
-[![Watch the real SignalBrief walkthrough, with annotations embedded in the video](docs/demo/walkthrough-poster.jpg)](https://github.com/tusharg007/signalbrief-competitive-intelligence/releases/download/walkthrough-2026-10-15/signalbrief-walkthrough.mp4)
-
-**[Watch / download the annotated MP4](https://github.com/tusharg007/signalbrief-competitive-intelligence/releases/download/walkthrough-2026-10-15/signalbrief-walkthrough.mp4)** · [Feature and test-case guide](docs/demo/README.md) · [Repository video](docs/demo/signalbrief-walkthrough.mp4)
-
-Real browser footage explores the inbox, evidence, five agent outputs, critique, measured execution, feedback-driven revision, version history, approval, exports, access checks, failure/retry/cancellation, public showcase and mobile views. Annotations are permanently embedded below the app; no separate subtitle file is needed. Historical Zapier and Slack captures are labelled and zoomed for readability.
-
-The 15 October recording uses an isolated local copy and real Groq inference, with new Slack delivery disabled. A fresh Notion brief and its revision completed; the initial larger evidence packet and an adversarial-input trial failed rather than being replaced with successful outputs. Rejection is demonstrated with a clearly labelled replay of the real generated report. Long processing waits are shortened and labelled. Hosted requests returned HTTP 502 or timed out during preflight; Linear collection failed TLS certificate validation, which was not bypassed. See the guide for exact outcomes and scope.
-
 ![The actual approved RSS-triggered brief, preserved in Neon and available in the public read-only workspace](docs/assets/verified-workspace.png)
 
 When a competitor announces a feature, a product team needs more than a summary. SignalBrief collects the original announcement, builds a cited dossier with CrewAI, asks an AutoGen council to challenge the implications, and presents concrete validation experiments for a human reviewer. Zapier connects the feed to the application and delivers review requests and approved summaries to Slack.
