@@ -1,0 +1,208 @@
+{
+  "recorded_date": "2026-10-15",
+  "capture": "Fresh browser viewport recording of actual saved hosted executions; no generated app output",
+  "editing": "Navigation and loading trimmed. Short chapter reading windows; annotations and progress line burned into video.",
+  "new_inference_or_slack_messages": false,
+  "cases": [
+    "d1434228a9ad4f92acc120d45af1c437",
+    "357d68840b1a43e0afb44834b1b64c05"
+  ],
+  "input_examples": "Linear and Notion forms shown without submission; not presented as new executions",
+  "integrations": {
+    "database": "ok",
+    "worker_online": true,
+    "runs": {
+      "approved": 3,
+      "failed": 1
+    },
+    "model_configured": true,
+    "provider": "groq",
+    "model": "openai/gpt-oss-120b",
+    "zapier_configured": true,
+    "daily_run_limit": 5
+  },
+  "duration_seconds": 216.133,
+  "resolution": "1920x1080",
+  "fps": 30,
+  "annotation_format": "Burned-in pixels; no subtitle stream",
+  "sha256": "07321c69fa279603a62a029c9d6a32a1b0fbbe0a7ec58bf8cbe41a35c5f321e5",
+  "bytes": 20712673,
+  "chapters": [
+    {
+      "start": 0,
+      "title": "SignalBrief: evidence to a human decision",
+      "seconds": 4.866667
+    },
+    {
+      "start": 4.867,
+      "title": "Live workspace: all integrations configured",
+      "seconds": 5.0
+    },
+    {
+      "start": 9.867,
+      "title": "Manual intake: a public announcement",
+      "seconds": 5.866667
+    },
+    {
+      "start": 15.733,
+      "title": "Example input: Linear coding-agent controls",
+      "seconds": 6.9
+    },
+    {
+      "start": 22.633,
+      "title": "A second competitor and its product context",
+      "seconds": 6.9
+    },
+    {
+      "start": 29.533,
+      "title": "Case 1: a real RSS-triggered brief",
+      "seconds": 6.866667
+    },
+    {
+      "start": 36.4,
+      "title": "Findings carry exact evidence excerpts",
+      "seconds": 6.866667
+    },
+    {
+      "start": 43.267,
+      "title": "From verified claims to strategic hypotheses",
+      "seconds": 6.866667
+    },
+    {
+      "start": 50.133,
+      "title": "Actions include owners and validation steps",
+      "seconds": 7.866667
+    },
+    {
+      "start": 58.0,
+      "title": "The critic challenges the business assumptions",
+      "seconds": 6.866667
+    },
+    {
+      "start": 64.867,
+      "title": "Unknowns remain visible to the reviewer",
+      "seconds": 5.866667
+    },
+    {
+      "start": 70.733,
+      "title": "Frozen evidence: the source packet used by the agents",
+      "seconds": 5.9
+    },
+    {
+      "start": 76.633,
+      "title": "Open the primary announcement evidence",
+      "seconds": 7.9
+    },
+    {
+      "start": 84.533,
+      "title": "Inspect the supporting competitor source",
+      "seconds": 5.866667
+    },
+    {
+      "start": 90.4,
+      "title": "Actual framework execution",
+      "seconds": 5.866667
+    },
+    {
+      "start": 96.267,
+      "title": "CrewAI researcher: source-backed dossier",
+      "seconds": 6.866667
+    },
+    {
+      "start": 103.133,
+      "title": "CrewAI verifier: structured research contract",
+      "seconds": 6.866667
+    },
+    {
+      "start": 110.0,
+      "title": "AutoGen strategist: propose the implications",
+      "seconds": 6.866667
+    },
+    {
+      "start": 116.867,
+      "title": "AutoGen critic: inspect the challenge",
+      "seconds": 7.9
+    },
+    {
+      "start": 124.767,
+      "title": "AutoGen editor: synthesize the final report",
+      "seconds": 6.9
+    },
+    {
+      "start": 131.667,
+      "title": "Compare with the research-only baseline",
+      "seconds": 5.9
+    },
+    {
+      "start": 137.567,
+      "title": "Actual timing and token measurements",
+      "seconds": 6.9
+    },
+    {
+      "start": 144.467,
+      "title": "Human approval and the transactional outbox",
+      "seconds": 6.866667
+    },
+    {
+      "start": 151.333,
+      "title": "A decision tied to the exact report version",
+      "seconds": 6.866667
+    },
+    {
+      "start": 158.2,
+      "title": "Case 2: a separate execution on Render",
+      "seconds": 6.9
+    },
+    {
+      "start": 165.1,
+      "title": "Cloud delivery accepted on the first attempt",
+      "seconds": 6.866667
+    },
+    {
+      "start": 171.967,
+      "title": "Slack received the hosted review request",
+      "seconds": 6.9
+    },
+    {
+      "start": 178.867,
+      "title": "Slack received the human-approved report",
+      "seconds": 7.866667
+    },
+    {
+      "start": 186.733,
+      "title": "Export the reviewed brief as Markdown",
+      "seconds": 4.866667
+    },
+    {
+      "start": 191.6,
+      "title": "A portfolio workspace anyone can inspect",
+      "seconds": 5.866667
+    },
+    {
+      "start": 197.467,
+      "title": "Review the same evidence on a narrow screen",
+      "seconds": 6.9
+    },
+    {
+      "start": 204.367,
+      "title": "Mobile evidence keeps the original source details",
+      "seconds": 5.866667
+    },
+    {
+      "start": 210.233,
+      "title": "Explore the deployed project",
+      "seconds": 5.9
+    }
+  ],
+  "qa": {
+    "full_decode": "passed",
+    "chapter_count": 33,
+    "subtitle_streams": 0,
+    "audio": "silent; explanation embedded in video pixels",
+    "video_codec": "h264",
+    "pixel_format": "yuvj420p",
+    "visual_review": "All 33 chapter samples reviewed; no missing-configuration banner or failure screen included.",
+    "regression_tests": "49 passed; application code unchanged",
+    "credential_scan": "Passed for publication files against locally configured credential values"
+  }
+}
